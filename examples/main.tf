@@ -1,32 +1,33 @@
 terraform {
   required_providers {
     curl2 = {
-      source = "example.io/example/curl2"
-      version = "0.3.1"
+      source = "mehulgohil/curl2"
+      version = "1.0.0"
     }
   }
 }
 
 provider "curl2" {}
 
-data "curl2" "get_request" {
+data "curl2" "getPosts" {
   http_method = "GET"
-  uri = "https://g3d99.mocklab.io/json"
-  json = "{\"id\":12345,\"value\":\"abc-def-ghi\"}"
-  auth_type = "Basic"
-  basic_auth_username = "mag"
-  basic_auth_password = "mag"
+  uri = "https://jsonplaceholder.typicode.com/posts"
 }
 
-#locals {
-#  json_data = jsondecode(data.curl2.getTodos.response)
-#}
-
-# Returns all Todos
-output "all_todos_response" {
-  value = jsondecode(data.curl2.getTodos.response.body)
+output "all_posts_response" {
+  value = jsondecode(data.curl2.getPosts.response.body)
 }
 
-output "all_todos_status" {
-  value = data.curl2.getTodos.response.status_code
+output "all_posts_status" {
+  value = data.curl2.getPosts.response.status_code
+}
+
+data "curl2" "postPosts" {
+  http_method = "POST"
+  uri = "https://jsonplaceholder.typicode.com/posts"
+  json = "{\"title\":\"foo\",\"body\":\"bar\",\"userId\":\"1\"}"
+}
+
+output "post_posts_output" {
+  value = data.curl2.postPosts.response
 }
