@@ -14,7 +14,7 @@ import (
 
 func main() {
 	err := providerserver.Serve(context.Background(), curl2.NewProvider, providerserver.ServeOpts{
-		Address: "example.io/example/curl2",
+		Address: "mehulgohil/curl2",
 	})
 	if err != nil {
 		log.Fatal(err.Error())
