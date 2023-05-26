@@ -12,9 +12,9 @@ provider "curl2" {}
 data "curl2" "getPosts" {
   http_method = "GET"
   uri = "https://jsonplaceholder.typicode.com/posts"
-#  auth_type = "Basic"
-#  basic_auth_username = "<UserName>"
-#  basic_auth_password = "<Password>"
+  #  auth_type = "Basic"
+  #  basic_auth_username = "<UserName>"
+  #  basic_auth_password = "<Password>"
 }
 
 output "all_posts_response" {
@@ -29,8 +29,8 @@ data "curl2" "postPosts" {
   http_method = "POST"
   uri = "https://jsonplaceholder.typicode.com/posts"
   json = "{\"title\":\"foo\",\"body\":\"bar\",\"userId\":\"1\"}" //need the json in string format
-#  auth_type = "Bearer"
-#  bearer_token = "<Any Bearer Token>"
+  #  auth_type = "Bearer"
+  #  bearer_token = "<Any Bearer Token>"
 }
 
 output "post_posts_output" {
