@@ -2,7 +2,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.0.2"
+      version = "1.0.3"
     }
   }
 }
@@ -15,6 +15,9 @@ data "curl2" "getPosts" {
   #  auth_type = "Basic"
   #  basic_auth_username = "<UserName>"
   #  basic_auth_password = "<Password>"
+  #  headers = {
+  #    Accept = "*/*"
+  #  }
 }
 
 output "all_posts_response" {
@@ -31,6 +34,10 @@ data "curl2" "postPosts" {
   json = "{\"title\":\"foo\",\"body\":\"bar\",\"userId\":\"1\"}" //need the json in string format
   #  auth_type = "Bearer"
   #  bearer_token = "<Any Bearer Token>"
+  #  headers = {
+  #    Accept = "*/*"
+  #    Content-Type = "application/json"
+  #  }
 }
 
 output "post_posts_output" {
