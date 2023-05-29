@@ -184,6 +184,7 @@ func (c *curl2DataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 	}
 	config.Response, diags = types.ObjectValue(
 		map[string]attr.Type{
+			"uri":         types.StringType,
 			"body":        types.StringType,
 			"status_code": types.Int64Type,
 		},
