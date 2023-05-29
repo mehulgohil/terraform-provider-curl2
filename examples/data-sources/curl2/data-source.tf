@@ -2,7 +2,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.0.3"
+      version = "1.1.1"
     }
   }
 }
