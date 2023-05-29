@@ -59,6 +59,7 @@ func (c *curl2DataSource) Schema(ctx context.Context, req datasource.SchemaReque
 			},
 			"response": schema.ObjectAttribute{
 				AttributeTypes: map[string]attr.Type{
+					"uri":         types.StringType,
 					"body":        types.StringType,
 					"status_code": types.Int64Type,
 				},
@@ -101,8 +102,6 @@ func (c *curl2DataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
-	uri := config.URI
-	httpMethod := config.HTTPMethod
 	var body io.Reader = nil
 
 	if config.JSON.ValueString() != "" {
@@ -126,7 +125,7 @@ func (c *curl2DataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		body = bytes.NewBuffer(requestBody)
 	}
 
-	newReq, err := http.NewRequest(httpMethod.ValueString(), uri.ValueString(), body)
+	newReq, err := http.NewRequest(config.HTTPMethod.ValueString(), config.URI.ValueString(), body)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create new http request",
@@ -189,6 +188,7 @@ func (c *curl2DataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 			"status_code": types.Int64Type,
 		},
 		map[string]attr.Value{
+			"uri":         config.URI,
 			"body":        types.StringValue(string(responseData)),
 			"status_code": types.Int64Value(int64(r.StatusCode)),
 		},

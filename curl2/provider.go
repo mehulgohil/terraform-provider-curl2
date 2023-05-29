@@ -22,7 +22,8 @@ type curl2Provider struct{}
 
 // curl2ProviderModel maps provider schema data to a Go type.
 type curl2ProviderModel struct {
-	DisableTLS types.Bool `tfsdk:"disable_tls"`
+	DisableTLS types.Bool  `tfsdk:"disable_tls"`
+	TimeoutMS  types.Int64 `tfsdk:"timeout_ms"`
 }
 
 func (c *curl2Provider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -37,6 +38,10 @@ func (c *curl2Provider) Schema(_ context.Context, _ provider.SchemaRequest, resp
 			"disable_tls": schema.BoolAttribute{
 				Optional:    true,
 				Description: "Use to disable the TLS verification. Defaults to false.",
+			},
+			"timeout_ms": schema.Int64Attribute{
+				Optional:    true,
+				Description: "Request Timeout in milliseconds. Defaults to 0, no timeout",
 			},
 		},
 	}
@@ -54,7 +59,7 @@ func (c *curl2Provider) Configure(ctx context.Context, req provider.ConfigureReq
 
 	opts := ApiClientOpts{
 		insecure: config.DisableTLS.ValueBool(),
-		timeout:  0, //default to 0, no timeout
+		timeout:  config.TimeoutMS.ValueInt64(),
 	}
 	client, err := NewClient(opts)
 	if err != nil {

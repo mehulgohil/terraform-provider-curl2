@@ -8,12 +8,11 @@ import (
 
 type ApiClientOpts struct {
 	insecure bool
-	timeout  int
+	timeout  int64
 }
 
 type HttpClient struct {
 	httpClient *http.Client
-	timeout    int
 }
 
 func NewClient(opts ApiClientOpts) (*HttpClient, error) {
@@ -28,7 +27,7 @@ func NewClient(opts ApiClientOpts) (*HttpClient, error) {
 
 	client := HttpClient{
 		httpClient: &http.Client{
-			Timeout:   time.Second * time.Duration(opts.timeout),
+			Timeout:   time.Millisecond * time.Duration(opts.timeout),
 			Transport: tr,
 		},
 	}
