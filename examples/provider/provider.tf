@@ -2,7 +2,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.0.2"
+      version = "1.0.3"
     }
   }
 }
@@ -12,6 +12,12 @@ provider "curl2" {}
 data "curl2" "getPosts" {
   http_method = "GET"
   uri = "https://jsonplaceholder.typicode.com/posts"
+  #  auth_type = "Basic"
+  #  basic_auth_username = "<UserName>"
+  #  basic_auth_password = "<Password>"
+  #  headers = {
+  #    Accept = "*/*"
+  #  }
 }
 
 output "all_posts_response" {

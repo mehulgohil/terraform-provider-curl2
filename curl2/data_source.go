@@ -30,6 +30,7 @@ type curl2DataModelRequest struct {
 	BearerToken       types.String `tfsdk:"bearer_token"`
 	BasicAuthUsername types.String `tfsdk:"basic_auth_username"`
 	BasicAuthPassword types.String `tfsdk:"basic_auth_password"`
+	Headers           types.Map    `tfsdk:"headers"`
 }
 
 type curl2DataSource struct {
@@ -82,6 +83,10 @@ func (c *curl2DataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Optional:    true,
 				Sensitive:   true,
 			},
+			"headers": schema.MapAttribute{
+				ElementType: types.StringType,
+				Optional:    true,
+			},
 		},
 	}
 }
@@ -127,6 +132,10 @@ func (c *curl2DataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 			err.Error(),
 		)
 		return
+	}
+
+	for eachHeaderKey, eachHeaderValue := range config.Headers.Elements() {
+		newReq.Header.Set(eachHeaderKey, eachHeaderValue.String())
 	}
 
 	if config.AuthType.ValueString() != "" {

@@ -17,7 +17,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.0.2"
+      version = "1.0.3"
     }
   }
 }
@@ -30,6 +30,9 @@ data "curl2" "getPosts" {
   #  auth_type = "Basic"
   #  basic_auth_username = "<UserName>"
   #  basic_auth_password = "<Password>"
+  #  headers = {
+  #    Accept = "*/*"
+  #  }
 }
 
 output "all_posts_response" {
@@ -46,6 +49,10 @@ data "curl2" "postPosts" {
   json = "{\"title\":\"foo\",\"body\":\"bar\",\"userId\":\"1\"}" //need the json in string format
   #  auth_type = "Bearer"
   #  bearer_token = "<Any Bearer Token>"
+  #  headers = {
+  #    Accept = "*/*"
+  #    Content-Type = "application/json"
+  #  }
 }
 
 output "post_posts_output" {
@@ -67,6 +74,7 @@ output "post_posts_output" {
 - `basic_auth_password` (String, Sensitive) Password to be used for Authentication.
 - `basic_auth_username` (String) Username to be used for Basic Authentication.
 - `bearer_token` (String, Sensitive) Bearer Token to be used for Authentication.
+- `headers` (Map of String)
 - `json` (String) JSON object in string format if using POST, PUT or PATCH method.
 
 ### Read-Only

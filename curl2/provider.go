@@ -26,7 +26,7 @@ func (c *curl2Provider) Metadata(_ context.Context, _ provider.MetadataRequest, 
 // Schema defines the provider-level schema for configuration data.
 func (c *curl2Provider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Triggers HTTP(s) requests along with JSON body and authentication",
+		Description: "Triggers HTTP(s) requests along with JSON body, authentication as well as custom headers",
 		Attributes:  map[string]schema.Attribute{},
 	}
 }
