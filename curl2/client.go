@@ -16,12 +16,7 @@ type HttpClient struct {
 	timeout    int
 }
 
-func NewClient() (*HttpClient, error) {
-	opts := ApiClientOpts{
-		insecure: false,
-		timeout:  0,
-	}
-
+func NewClient(opts ApiClientOpts) (*HttpClient, error) {
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: opts.insecure,
 	}

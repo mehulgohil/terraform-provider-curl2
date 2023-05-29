@@ -17,12 +17,14 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.1.1"
+      version = "1.2.0"
     }
   }
 }
 
-provider "curl2" {}
+provider "curl2" {
+  #  disable_tls = true
+}
 
 data "curl2" "getPosts" {
   http_method = "GET"
@@ -74,7 +76,7 @@ output "post_posts_output" {
 - `basic_auth_password` (String, Sensitive) Password to be used for Authentication.
 - `basic_auth_username` (String) Username to be used for Basic Authentication.
 - `bearer_token` (String, Sensitive) Bearer Token to be used for Authentication.
-- `headers` (Map of String)
+- `headers` (Map of String) Headers to be added.
 - `json` (String) JSON object in string format if using POST, PUT or PATCH method.
 
 ### Read-Only
