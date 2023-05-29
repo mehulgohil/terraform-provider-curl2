@@ -17,13 +17,14 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.2.0"
+      version = "1.3.0"
     }
   }
 }
 
 provider "curl2" {
   #  disable_tls = true
+  #  timeout_ms = 500
 }
 
 data "curl2" "getPosts" {
@@ -52,3 +53,4 @@ output "all_posts_status" {
 ### Optional
 
 - `disable_tls` (Boolean) Use to disable the TLS verification. Defaults to false.
+- `timeout_ms` (Number) Request Timeout in milliseconds. Defaults to 0, no timeout
