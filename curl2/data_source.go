@@ -84,7 +84,7 @@ func (c *curl2DataSource) Schema(ctx context.Context, req datasource.SchemaReque
 				Sensitive:   true,
 			},
 			"headers": schema.MapAttribute{
-				Description: "Headers to be added",
+				Description: "Headers to be added.",
 				ElementType: types.StringType,
 				Optional:    true,
 			},
