@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"io"
-	"net/http"
 )
 
 var (
@@ -125,7 +125,7 @@ func (c *curl2DataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		body = bytes.NewBuffer(requestBody)
 	}
 
-	newReq, err := http.NewRequest(config.HTTPMethod.ValueString(), config.URI.ValueString(), body)
+	newReq, err := retryablehttp.NewRequest(config.HTTPMethod.ValueString(), config.URI.ValueString(), body)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unable to create new http request",
