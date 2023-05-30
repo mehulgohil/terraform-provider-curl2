@@ -2,7 +2,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.3.1"
+      version = "1.4.0"
     }
   }
 }
@@ -10,6 +10,11 @@ terraform {
 provider "curl2" {
   #  disable_tls = true
   #  timeout_ms = 500
+  #  retry {
+  #    retry_attempts = 5
+  #    min_delay_ms = 5
+  #    max_delay_ms = 10
+  #  }
 }
 
 data "curl2" "getPosts" {

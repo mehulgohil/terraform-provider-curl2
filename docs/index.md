@@ -17,7 +17,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.3.1"
+      version = "1.4.0"
     }
   }
 }
@@ -25,6 +25,11 @@ terraform {
 provider "curl2" {
   #  disable_tls = true
   #  timeout_ms = 500
+  #  retry {
+  #    retry_attempts = 5
+  #    min_delay_ms = 5
+  #    max_delay_ms = 10
+  #  }
 }
 
 data "curl2" "getPosts" {
@@ -53,4 +58,14 @@ output "all_posts_status" {
 ### Optional
 
 - `disable_tls` (Boolean) Use to disable the TLS verification. Defaults to false.
+- `retry` (Block, Optional) Retry request configuration. By default there are no retries. (see [below for nested schema](#nestedblock--retry))
 - `timeout_ms` (Number) Request Timeout in milliseconds. Defaults to 0, no timeout
+
+<a id="nestedblock--retry"></a>
+### Nested Schema for `retry`
+
+Optional:
+
+- `max_delay_ms` (Number) The maximum delay between retry requests in milliseconds.
+- `min_delay_ms` (Number) The minimum delay between retry requests in milliseconds.
+- `retry_attempts` (Number) The number of times the request is to be retried. For example, if 2 is specified, the request will be tried a maximum of 3 times.
