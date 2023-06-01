@@ -17,7 +17,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.4.0"
+      version = "1.5.0"
     }
   }
 }
@@ -30,25 +30,11 @@ provider "curl2" {
   #    min_delay_ms = 5
   #    max_delay_ms = 10
   #  }
-}
-
-data "curl2" "getPosts" {
-  http_method = "GET"
-  uri = "https://jsonplaceholder.typicode.com/posts"
-  #  auth_type = "Basic"
-  #  basic_auth_username = "<UserName>"
-  #  basic_auth_password = "<Password>"
-  #  headers = {
-  #    Accept = "*/*"
+  #  azure_ad {
+  #    client_id = "<AZURE_CLIENT_ID>"
+  #    client_secret = "<AZURE_CLIENT_SECRET>"
+  #    tenant_id = "<AZURE_TENANT_ID>"
   #  }
-}
-
-output "all_posts_response" {
-  value = jsondecode(data.curl2.getPosts.response.body)
-}
-
-output "all_posts_status" {
-  value = data.curl2.getPosts.response.status_code
 }
 ```
 
@@ -57,9 +43,20 @@ output "all_posts_status" {
 
 ### Optional
 
+- `azure_ad` (Block, Optional) Azure AD Configuration which is required if you are using `curl2_azuread_token` data (see [below for nested schema](#nestedblock--azure_ad))
 - `disable_tls` (Boolean) Use to disable the TLS verification. Defaults to false.
 - `retry` (Block, Optional) Retry request configuration. By default there are no retries. (see [below for nested schema](#nestedblock--retry))
 - `timeout_ms` (Number) Request Timeout in milliseconds. Defaults to 0, no timeout
+
+<a id="nestedblock--azure_ad"></a>
+### Nested Schema for `azure_ad`
+
+Optional:
+
+- `client_id` (String) Application ID of an Azure service principal. You can also set is as ENV variable `AZURE_CLIENT_ID`
+- `client_secret` (String) Password of the Azure service principal. You can also set is as ENV variable `AZURE_CLIENT_SECRET`
+- `tenant_id` (String) ID of the application's Azure AD tenant. You can also set is as ENV variable `AZURE_TENANT_ID`
+
 
 <a id="nestedblock--retry"></a>
 ### Nested Schema for `retry`

@@ -15,6 +15,9 @@ This enables you to send structured data to the API endpoints.
 You can provide headers like API keys, tokens, or other authentication mechanisms required by the API.
 4. Custom Headers: The custom provider supports the inclusion of custom additional headers in the HTTP requests.
 
+Azure AD Token DataSource:
+This data source helps you to get the token via client credential flow.
+
 ## Example
 
 ```hcl
@@ -22,7 +25,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.4.0"
+      version = "1.5.0"
     }
   }
 }

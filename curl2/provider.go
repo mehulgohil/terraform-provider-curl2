@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"os"
 )
 
 var (
@@ -26,12 +27,19 @@ type curl2ProviderModel struct {
 	DisableTLS types.Bool   `tfsdk:"disable_tls"`
 	TimeoutMS  types.Int64  `tfsdk:"timeout_ms"`
 	Retry      types.Object `tfsdk:"retry"`
+	AzureAD    types.Object `tfsdk:"azure_ad"`
 }
 
 type retryModel struct {
 	RetryAttempts types.Int64 `tfsdk:"retry_attempts"`
 	MinDelay      types.Int64 `tfsdk:"min_delay_ms"`
 	MaxDelay      types.Int64 `tfsdk:"max_delay_ms"`
+}
+
+type azureADModel struct {
+	ClientID     types.String `tfsdk:"client_id"`
+	ClientSecret types.String `tfsdk:"client_secret"`
+	TenantID     types.String `tfsdk:"tenant_id"`
 }
 
 func (c *curl2Provider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -70,6 +78,23 @@ func (c *curl2Provider) Schema(_ context.Context, _ provider.SchemaRequest, resp
 					},
 				},
 			},
+			"azure_ad": schema.SingleNestedBlock{
+				Description: "Azure AD Configuration which is required if you are using `curl2_azuread_token` data",
+				Attributes: map[string]schema.Attribute{
+					"client_id": schema.StringAttribute{
+						Description: "Application ID of an Azure service principal. You can also set is as ENV variable `AZURE_CLIENT_ID`",
+						Optional:    true,
+					},
+					"client_secret": schema.StringAttribute{
+						Description: "Password of the Azure service principal. You can also set is as ENV variable `AZURE_CLIENT_SECRET`",
+						Optional:    true,
+					},
+					"tenant_id": schema.StringAttribute{
+						Description: "ID of the application's Azure AD tenant. You can also set is as ENV variable `AZURE_TENANT_ID`",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -82,6 +107,40 @@ func (c *curl2Provider) Configure(ctx context.Context, req provider.ConfigureReq
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
+	}
+
+	var azureAD azureADModel
+	if !config.AzureAD.IsNull() && !config.AzureAD.IsUnknown() {
+		diags = config.AzureAD.As(ctx, &azureAD, basetypes.ObjectAsOptions{})
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
+
+		err := os.Setenv("AZURE_CLIENT_ID", azureAD.ClientID.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Unable to set AZURE_CLIENT_ID Env Variables",
+				err.Error(),
+			)
+			return
+		}
+		err = os.Setenv("AZURE_CLIENT_SECRET", azureAD.ClientSecret.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Unable to set AZURE_CLIENT_SECRET Env Variables",
+				err.Error(),
+			)
+			return
+		}
+		err = os.Setenv("AZURE_TENANT_ID", azureAD.TenantID.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Unable to set AZURE_TENANT_ID Env Variables",
+				err.Error(),
+			)
+			return
+		}
 	}
 
 	var retry retryModel
@@ -109,6 +168,7 @@ func (c *curl2Provider) Configure(ctx context.Context, req provider.ConfigureReq
 func (c *curl2Provider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewCurl2DataSource,
+		NewAzureADTokenDataSource,
 	}
 }
 
