@@ -2,7 +2,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.4.0"
+      version = "1.5.0"
     }
   }
 }
@@ -15,23 +15,9 @@ provider "curl2" {
   #    min_delay_ms = 5
   #    max_delay_ms = 10
   #  }
-}
-
-data "curl2" "getPosts" {
-  http_method = "GET"
-  uri = "https://jsonplaceholder.typicode.com/posts"
-  #  auth_type = "Basic"
-  #  basic_auth_username = "<UserName>"
-  #  basic_auth_password = "<Password>"
-  #  headers = {
-  #    Accept = "*/*"
+  #  azure_ad {
+  #    client_id = "<AZURE_CLIENT_ID>"
+  #    client_secret = "<AZURE_CLIENT_SECRET>"
+  #    tenant_id = "<AZURE_TENANT_ID>"
   #  }
-}
-
-output "all_posts_response" {
-  value = jsondecode(data.curl2.getPosts.response.body)
-}
-
-output "all_posts_status" {
-  value = data.curl2.getPosts.response.status_code
 }
