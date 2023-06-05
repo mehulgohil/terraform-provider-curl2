@@ -8,11 +8,11 @@ terraform {
 }
 
 provider "curl2" {
-    azure_ad {
-      client_id = "<AZURE_CLIENT_ID>" //You can also set ENV AZURE_CLIENT_ID
-      client_secret = "<AZURE_CLIENT_SECRET>" //You can also set ENV AZURE_CLIENT_SECRET
-      tenant_id = "<AZURE_TENANT_ID>" //You can also set ENV AZURE_TENANT_ID
-    }
+  azure_ad {
+    client_id = "<AZURE_CLIENT_ID>"
+    client_secret = "<AZURE_CLIENT_SECRET>"
+    tenant_id = "<AZURE_TENANT_ID>"
+  }
 }
 
 data "curl2_azuread_token" azureADToken {

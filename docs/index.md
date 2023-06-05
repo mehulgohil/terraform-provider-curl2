@@ -17,7 +17,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.5.0"
+      version = "1.6.0"
     }
   }
 }
@@ -30,10 +30,17 @@ provider "curl2" {
   #    min_delay_ms = 5
   #    max_delay_ms = 10
   #  }
+
   #  azure_ad {
   #    client_id = "<AZURE_CLIENT_ID>"
   #    client_secret = "<AZURE_CLIENT_SECRET>"
   #    tenant_id = "<AZURE_TENANT_ID>"
+  #  }
+
+  #  auth0 {
+  #    client_id = "<AUTH0_CLIENT_ID>"
+  #    client_secret = "<AUTH0_CLIENT_SECRET>"
+  #    domain = "<AUTH0_DOMAIN>"
   #  }
 }
 ```
@@ -43,10 +50,21 @@ provider "curl2" {
 
 ### Optional
 
+- `auth0` (Block, Optional) Auth0 Configuration which is required if you are using `curl2_auth0_token` data (see [below for nested schema](#nestedblock--auth0))
 - `azure_ad` (Block, Optional) Azure AD Configuration which is required if you are using `curl2_azuread_token` data (see [below for nested schema](#nestedblock--azure_ad))
 - `disable_tls` (Boolean) Use to disable the TLS verification. Defaults to false.
 - `retry` (Block, Optional) Retry request configuration. By default there are no retries. (see [below for nested schema](#nestedblock--retry))
 - `timeout_ms` (Number) Request Timeout in milliseconds. Defaults to 0, no timeout
+
+<a id="nestedblock--auth0"></a>
+### Nested Schema for `auth0`
+
+Optional:
+
+- `client_id` (String) Application's Client ID. You can also set is as ENV variable `AUTH0_CLIENT_ID`
+- `client_secret` (String) Application's Client Secret. You can also set is as ENV variable `AUTH0_CLIENT_SECRET`
+- `domain` (String) Auth0 domain URL in the format `https://<your-tenant-name>.auth0.com`. You can also set is as ENV variable `AUTH0_DOMAIN`
+
 
 <a id="nestedblock--azure_ad"></a>
 ### Nested Schema for `azure_ad`
