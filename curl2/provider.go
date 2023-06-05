@@ -56,7 +56,7 @@ func (c *curl2Provider) Metadata(_ context.Context, _ provider.MetadataRequest, 
 // Schema defines the provider-level schema for configuration data.
 func (c *curl2Provider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		Description: "Triggers HTTP(s) requests along with JSON body, authentication as well as custom headers",
+		Description: "Triggers HTTP(s) requests along with JSON body, authentication as well as custom headers. It also supports token generation from IDP like Azure AD, Auth0.",
 		Attributes: map[string]schema.Attribute{
 			"disable_tls": schema.BoolAttribute{
 				Optional:    true,
@@ -89,15 +89,15 @@ func (c *curl2Provider) Schema(_ context.Context, _ provider.SchemaRequest, resp
 				Description: "Azure AD Configuration which is required if you are using `curl2_azuread_token` data",
 				Attributes: map[string]schema.Attribute{
 					"client_id": schema.StringAttribute{
-						Description: "Application ID of an Azure service principal. You can also set is as ENV variable `AZURE_CLIENT_ID`",
+						Description: "Application ID of an Azure service principal. You can also set it as ENV variable `AZURE_CLIENT_ID`",
 						Optional:    true,
 					},
 					"client_secret": schema.StringAttribute{
-						Description: "Password of the Azure service principal. You can also set is as ENV variable `AZURE_CLIENT_SECRET`",
+						Description: "Password of the Azure service principal. You can also set it as ENV variable `AZURE_CLIENT_SECRET`",
 						Optional:    true,
 					},
 					"tenant_id": schema.StringAttribute{
-						Description: "ID of the application's Azure AD tenant. You can also set is as ENV variable `AZURE_TENANT_ID`",
+						Description: "ID of the application's Azure AD tenant. You can also set it as ENV variable `AZURE_TENANT_ID`",
 						Optional:    true,
 					},
 				},
@@ -106,15 +106,15 @@ func (c *curl2Provider) Schema(_ context.Context, _ provider.SchemaRequest, resp
 				Description: "Auth0 Configuration which is required if you are using `curl2_auth0_token` data",
 				Attributes: map[string]schema.Attribute{
 					"client_id": schema.StringAttribute{
-						Description: "Application's Client ID. You can also set is as ENV variable `AUTH0_CLIENT_ID`",
+						Description: "Application's Client ID. You can also set it as ENV variable `AUTH0_CLIENT_ID`",
 						Optional:    true,
 					},
 					"client_secret": schema.StringAttribute{
-						Description: "Application's Client Secret. You can also set is as ENV variable `AUTH0_CLIENT_SECRET`",
+						Description: "Application's Client Secret. You can also set it as ENV variable `AUTH0_CLIENT_SECRET`",
 						Optional:    true,
 					},
 					"domain": schema.StringAttribute{
-						Description: "Auth0 domain URL in the format `https://<your-tenant-name>.auth0.com`. You can also set is as ENV variable `AUTH0_DOMAIN`",
+						Description: "Auth0 domain URL in the format `https://<your-tenant-name>.auth0.com`. You can also set it as ENV variable `AUTH0_DOMAIN`",
 						Optional:    true,
 					},
 				},
