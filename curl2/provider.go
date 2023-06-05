@@ -28,6 +28,7 @@ type curl2ProviderModel struct {
 	TimeoutMS  types.Int64  `tfsdk:"timeout_ms"`
 	Retry      types.Object `tfsdk:"retry"`
 	AzureAD    types.Object `tfsdk:"azure_ad"`
+	Auth0      types.Object `tfsdk:"auth0"`
 }
 
 type retryModel struct {
@@ -40,6 +41,12 @@ type azureADModel struct {
 	ClientID     types.String `tfsdk:"client_id"`
 	ClientSecret types.String `tfsdk:"client_secret"`
 	TenantID     types.String `tfsdk:"tenant_id"`
+}
+
+type auth0Model struct {
+	ClientID     types.String `tfsdk:"client_id"`
+	ClientSecret types.String `tfsdk:"client_secret"`
+	Domain       types.String `tfsdk:"domain"`
 }
 
 func (c *curl2Provider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -95,6 +102,23 @@ func (c *curl2Provider) Schema(_ context.Context, _ provider.SchemaRequest, resp
 					},
 				},
 			},
+			"auth0": schema.SingleNestedBlock{
+				Description: "Auth0 Configuration which is required if you are using `curl2_auth0_token` data",
+				Attributes: map[string]schema.Attribute{
+					"client_id": schema.StringAttribute{
+						Description: "Application's Client ID. You can also set is as ENV variable `AUTH0_CLIENT_ID`",
+						Optional:    true,
+					},
+					"client_secret": schema.StringAttribute{
+						Description: "Application's Client Secret. You can also set is as ENV variable `AUTH0_CLIENT_SECRET`",
+						Optional:    true,
+					},
+					"domain": schema.StringAttribute{
+						Description: "Auth0 domain URL in the format `https://<your-tenant-name>.auth0.com`. You can also set is as ENV variable `AUTH0_DOMAIN`",
+						Optional:    true,
+					},
+				},
+			},
 		},
 	}
 }
@@ -143,8 +167,41 @@ func (c *curl2Provider) Configure(ctx context.Context, req provider.ConfigureReq
 		}
 	}
 
-	var retry retryModel
+	var auth0Config auth0Model
+	if !config.Auth0.IsNull() && !config.Auth0.IsUnknown() {
+		diags = config.Auth0.As(ctx, &auth0Config, basetypes.ObjectAsOptions{})
+		resp.Diagnostics.Append(diags...)
+		if resp.Diagnostics.HasError() {
+			return
+		}
 
+		err := os.Setenv("AUTH0_CLIENT_ID", auth0Config.ClientID.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Unable to set AUTH0_CLIENT_ID Env Variables",
+				err.Error(),
+			)
+			return
+		}
+		err = os.Setenv("AUTH0_CLIENT_SECRET", auth0Config.ClientSecret.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Unable to set AUTH0_CLIENT_SECRET Env Variables",
+				err.Error(),
+			)
+			return
+		}
+		err = os.Setenv("AUTH0_DOMAIN", auth0Config.Domain.ValueString())
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Unable to set AUTH0_DOMAIN Env Variables",
+				err.Error(),
+			)
+			return
+		}
+	}
+
+	var retry retryModel
 	if !config.Retry.IsNull() && !config.Retry.IsUnknown() {
 		diags = config.Retry.As(ctx, &retry, basetypes.ObjectAsOptions{})
 		resp.Diagnostics.Append(diags...)
@@ -169,6 +226,7 @@ func (c *curl2Provider) DataSources(ctx context.Context) []func() datasource.Dat
 	return []func() datasource.DataSource{
 		NewCurl2DataSource,
 		NewAzureADTokenDataSource,
+		NewAuth0TokenDataSource,
 	}
 }
 
