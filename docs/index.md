@@ -3,12 +3,12 @@
 page_title: "curl2 Provider"
 subcategory: ""
 description: |-
-  Triggers HTTP(s) requests along with JSON body, authentication as well as custom headers
+  Triggers HTTP(s) requests along with JSON body, authentication as well as custom headers. It also supports token generation from IDP like Azure AD, Auth0.
 ---
 
 # curl2 Provider
 
-Triggers HTTP(s) requests along with JSON body, authentication as well as custom headers
+Triggers HTTP(s) requests along with JSON body, authentication as well as custom headers. It also supports token generation from IDP like Azure AD, Auth0.
 
 ## Example Usage
 
@@ -61,9 +61,9 @@ provider "curl2" {
 
 Optional:
 
-- `client_id` (String) Application's Client ID. You can also set is as ENV variable `AUTH0_CLIENT_ID`
-- `client_secret` (String) Application's Client Secret. You can also set is as ENV variable `AUTH0_CLIENT_SECRET`
-- `domain` (String) Auth0 domain URL in the format `https://<your-tenant-name>.auth0.com`. You can also set is as ENV variable `AUTH0_DOMAIN`
+- `client_id` (String) Application's Client ID. You can also set it as ENV variable `AUTH0_CLIENT_ID`
+- `client_secret` (String) Application's Client Secret. You can also set it as ENV variable `AUTH0_CLIENT_SECRET`
+- `domain` (String) Auth0 domain URL in the format `https://<your-tenant-name>.auth0.com`. You can also set it as ENV variable `AUTH0_DOMAIN`
 
 
 <a id="nestedblock--azure_ad"></a>
@@ -71,9 +71,9 @@ Optional:
 
 Optional:
 
-- `client_id` (String) Application ID of an Azure service principal. You can also set is as ENV variable `AZURE_CLIENT_ID`
-- `client_secret` (String) Password of the Azure service principal. You can also set is as ENV variable `AZURE_CLIENT_SECRET`
-- `tenant_id` (String) ID of the application's Azure AD tenant. You can also set is as ENV variable `AZURE_TENANT_ID`
+- `client_id` (String) Application ID of an Azure service principal. You can also set it as ENV variable `AZURE_CLIENT_ID`
+- `client_secret` (String) Password of the Azure service principal. You can also set it as ENV variable `AZURE_CLIENT_SECRET`
+- `tenant_id` (String) ID of the application's Azure AD tenant. You can also set it as ENV variable `AZURE_TENANT_ID`
 
 
 <a id="nestedblock--retry"></a>

@@ -3,6 +3,7 @@
 ## Overview
 terraform-provider-curl2 is designed to help make HTTP(s) requests,
 with additional support for providing JSON bodies and authentication headers.
+It also has data sources that help to get the access token from azure ad, auth0.
 
 * [Curl2 Provider Documentation](https://registry.terraform.io/providers/mehulgohil/curl2/latest/docs)
 
@@ -14,6 +15,8 @@ This enables you to send structured data to the API endpoints.
 3. Authentication Headers: The custom provider supports the inclusion of authentication headers in the HTTP requests.
 You can provide headers like API keys, tokens, or other authentication mechanisms required by the API.
 4. Custom Headers: The custom provider supports the inclusion of custom additional headers in the HTTP requests.
+5. Azure AD Token Data Source: Get token from Azure AD.
+6. Auth0 Token Data Source: Get token from Auth0. 
 
 Azure AD Token DataSource:
 This data source helps you to get the token via client credential flow.
@@ -25,7 +28,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.6.0"
+      version = "1.6.1"
     }
   }
 }
