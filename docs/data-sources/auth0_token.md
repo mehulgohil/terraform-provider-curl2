@@ -24,9 +24,9 @@ terraform {
 
 provider "curl2" {
     auth0 {
-      client_id = "<AUTH0_CLIENT_ID>"
-      client_secret = "<AUTH0_CLIENT_SECRET>"
-      domain = "<AUTH0_DOMAIN>"
+      client_id = "<AUTH0_CLIENT_ID>" //You can also set ENV AUTH0_CLIENT_ID
+      client_secret = "<AUTH0_CLIENT_SECRET>" //You can also set ENV AUTH0_CLIENT_SECRET
+      domain = "<AUTH0_DOMAIN>" //You can also set ENV AUTH0_DOMAIN
     }
 }
 
