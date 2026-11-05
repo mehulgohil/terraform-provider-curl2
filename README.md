@@ -1,5 +1,10 @@
 # terraform-provider-curl2
 
+[![Tests](https://github.com/mehulgohil/terraform-provider-curl2/actions/workflows/test.yml/badge.svg)](https://github.com/mehulgohil/terraform-provider-curl2/actions/workflows/test.yml)
+[![Release](https://img.shields.io/github/v/release/mehulgohil/terraform-provider-curl2)](https://github.com/mehulgohil/terraform-provider-curl2/releases/latest)
+[![Terraform Registry downloads](https://img.shields.io/terraform/provider/dt/4207?label=registry%20downloads)](https://registry.terraform.io/providers/mehulgohil/curl2/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 ## Overview
 terraform-provider-curl2 is designed to help make HTTP(s) requests,
 with additional support for providing JSON bodies and authentication headers.
