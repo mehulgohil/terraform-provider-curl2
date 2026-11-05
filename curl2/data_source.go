@@ -134,8 +134,9 @@ func (c *curl2DataSource) Read(ctx context.Context, req datasource.ReadRequest, 
 		return
 	}
 
-	for eachHeaderKey, eachHeaderValue := range config.Headers.Elements() {
-		newReq.Header.Set(eachHeaderKey, eachHeaderValue.String())
+	resp.Diagnostics.Append(setHeaders(ctx, newReq, config.Headers)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
 
 	if config.AuthType.ValueString() != "" {
