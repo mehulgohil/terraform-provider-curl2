@@ -246,5 +246,7 @@ func (c *curl2Provider) EphemeralResources(ctx context.Context) []func() ephemer
 }
 
 func (c *curl2Provider) Resources(ctx context.Context) []func() resource.Resource {
-	return []func() resource.Resource{}
+	return []func() resource.Resource{
+		NewCurl2Resource,
+	}
 }
