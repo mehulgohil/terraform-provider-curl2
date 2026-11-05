@@ -17,7 +17,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.6.1"
+      version = "1.6.3"
     }
   }
 }
@@ -41,6 +41,7 @@ data "curl2" "getPosts" {
   #  headers = {
   #    Accept = "*/*"
   #  }
+  #  ignore_errors = true  # do not fail the plan if the request fails; see error
 }
 
 output "all_posts_response" {
@@ -83,10 +84,12 @@ output "post_posts_output" {
 - `basic_auth_username` (String) Username to be used for Basic Authentication.
 - `bearer_token` (String, Sensitive) Bearer Token to be used for Authentication.
 - `headers` (Map of String) Headers to be added.
+- `ignore_errors` (Boolean) If true, a request that fails (connection refused, DNS failure, timeout, or a 429/5xx response that is still failing after the configured retries) does not fail the plan. Instead `error` holds the reason, `response.status_code` is 0 and `response.body` is empty. Defaults to false.
 - `json` (String) JSON object in string format if using POST, PUT or PATCH method.
 
 ### Read-Only
 
+- `error` (String) Why the request failed when `ignore_errors` is true. Null when the request succeeded.
 - `response` (Object) Valued returned by the HTTP request. (see [below for nested schema](#nestedatt--response))
 
 <a id="nestedatt--response"></a>

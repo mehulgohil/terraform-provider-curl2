@@ -2,10 +2,11 @@ package curl2
 
 import (
 	"crypto/tls"
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"net/http"
 	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 type ApiClientOpts struct {
@@ -20,6 +21,12 @@ type HttpClient struct {
 	httpClient *retryablehttp.Client
 }
 
+// NewClient builds the HTTP client every data source uses.
+//
+// The TLS setting and the timeout go on retryClient.HTTPClient, the client
+// that sends each attempt. They used to be set on a copy returned by
+// StandardClient() that nothing used, so disable_tls and timeout_ms had no
+// effect.
 func NewClient(opts ApiClientOpts) *HttpClient {
 	retryClient := retryablehttp.NewClient()
 	retryClient.RetryMax = opts.maxRetries
@@ -32,25 +39,13 @@ func NewClient(opts ApiClientOpts) *HttpClient {
 		retryClient.RetryWaitMax = time.Duration(opts.maxDelay.ValueInt64()) * time.Millisecond
 	}
 
-	standardClient := retryClient.StandardClient()
+	transport := http.DefaultTransport.(*http.Transport).Clone() // keeps ProxyFromEnvironment
+	transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: opts.insecure}
 
-	tlsConfig := &tls.Config{
-		InsecureSkipVerify: opts.insecure,
-	}
-	standardClient.Transport = &http.Transport{
-		TLSClientConfig: tlsConfig,
-		Proxy:           http.ProxyFromEnvironment,
+	retryClient.HTTPClient = &http.Client{
+		Transport: transport,
+		Timeout:   time.Duration(opts.timeout) * time.Millisecond, // 0 means no timeout
 	}
 
-	tr := &http.Transport{
-		TLSClientConfig: tlsConfig,
-		Proxy:           http.ProxyFromEnvironment,
-	}
-	standardClient.Transport = tr
-
-	client := HttpClient{
-		httpClient: retryClient,
-	}
-
-	return &client
+	return &HttpClient{httpClient: retryClient}
 }
