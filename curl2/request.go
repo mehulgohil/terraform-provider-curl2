@@ -49,50 +49,75 @@ var responseAttrTypes = map[string]attr.Type{
 	"status_code": types.Int64Type,
 }
 
-// runCurl2Request sends the request the model describes and fills in
-// m.Response and m.Error.
-func runCurl2Request(ctx context.Context, client *HttpClient, m *curl2DataModelRequest) diag.Diagnostics {
+// authConfig is the auth_type / bearer_token / basic_auth_* attributes.
+type authConfig struct {
+	AuthType          types.String
+	BearerToken       types.String
+	BasicAuthUsername types.String
+	BasicAuthPassword types.String
+}
+
+// newRequest builds a request with an optional JSON body, headers and auth.
+func newRequest(ctx context.Context, method, uri, jsonBody string, headers types.Map, auth authConfig) (*retryablehttp.Request, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
 	var body io.Reader
-	if m.JSON.ValueString() != "" {
+	if jsonBody != "" {
 		var jsonData any
-		if err := json.Unmarshal([]byte(m.JSON.ValueString()), &jsonData); err != nil {
+		if err := json.Unmarshal([]byte(jsonBody), &jsonData); err != nil {
 			diags.AddError("Failed to parse JSON parameter", err.Error())
-			return diags
+			return nil, diags
 		}
 		requestBody, err := json.Marshal(jsonData)
 		if err != nil {
 			diags.AddError("Failed to marshal JSON data", err.Error())
-			return diags
+			return nil, diags
 		}
 		body = bytes.NewBuffer(requestBody)
 	}
 
-	req, err := retryablehttp.NewRequestWithContext(ctx, m.HTTPMethod.ValueString(), m.URI.ValueString(), body)
+	req, err := retryablehttp.NewRequestWithContext(ctx, method, uri, body)
 	if err != nil {
 		diags.AddError("Unable to create new http request", err.Error())
-		return diags
+		return nil, diags
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
 	}
 
-	diags.Append(setHeaders(ctx, req, m.Headers)...)
+	diags.Append(setHeaders(ctx, req, headers)...)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	switch auth.AuthType.ValueString() {
+	case "Bearer":
+		if auth.BearerToken.ValueString() == "" {
+			diags.AddError("Invalid Bearer Token", "Bearer Token Parameter must be provided")
+			return nil, diags
+		}
+		req.Header.Set("Authorization", "Bearer "+auth.BearerToken.ValueString())
+	case "Basic":
+		if auth.BasicAuthUsername.ValueString() == "" || auth.BasicAuthPassword.ValueString() == "" {
+			diags.AddError("Invalid Basic Auth Token", "Basic Username and Password Parameters must be provided")
+			return nil, diags
+		}
+		req.SetBasicAuth(auth.BasicAuthUsername.ValueString(), auth.BasicAuthPassword.ValueString())
+	}
+	return req, diags
+}
+
+// runCurl2Request sends the request the model describes and fills in
+// m.Response and m.Error.
+func runCurl2Request(ctx context.Context, client *HttpClient, m *curl2DataModelRequest) diag.Diagnostics {
+	req, diags := newRequest(ctx, m.HTTPMethod.ValueString(), m.URI.ValueString(), m.JSON.ValueString(), m.Headers, authConfig{
+		AuthType:          m.AuthType,
+		BearerToken:       m.BearerToken,
+		BasicAuthUsername: m.BasicAuthUsername,
+		BasicAuthPassword: m.BasicAuthPassword,
+	})
 	if diags.HasError() {
 		return diags
-	}
-
-	switch m.AuthType.ValueString() {
-	case "Bearer":
-		if m.BearerToken.ValueString() == "" {
-			diags.AddError("Invalid Bearer Token", "Bearer Token Parameter must be provided")
-			return diags
-		}
-		req.Header.Set("Authorization", "Bearer "+m.BearerToken.ValueString())
-	case "Basic":
-		if m.BasicAuthUsername.ValueString() == "" || m.BasicAuthPassword.ValueString() == "" {
-			diags.AddError("Invalid Basic Auth Token", "Basic Username and Password Parameters must be provided")
-			return diags
-		}
-		req.SetBasicAuth(m.BasicAuthUsername.ValueString(), m.BasicAuthPassword.ValueString())
 	}
 
 	statusCode, responseData, summary, err := send(client, req)

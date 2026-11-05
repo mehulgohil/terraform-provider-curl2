@@ -20,6 +20,8 @@ You can provide headers like API keys, tokens, or other authentication mechanism
 7. Ephemeral resources (Terraform 1.10+): `ephemeral "curl2_auth0_token"`, `ephemeral "curl2_azuread_token"` and
 `ephemeral "curl2"` fetch tokens and send requests without writing the token or the response to the plan or state file.
 See [Keeping tokens out of state](#keeping-tokens-out-of-state).
+8. `curl2` resource: manage an object behind a REST API (webhooks, DNS records, feature flags) with a request on create
+and optional requests on read, update and destroy. See [Managing an API object](#managing-an-api-object).
 
 Azure AD Token DataSource:
 This data source helps you to get the token via client credential flow.
@@ -31,7 +33,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.7.0"
+      version = "1.8.0"
     }
   }
 }
@@ -85,3 +87,31 @@ ephemeral "curl2" "me" {
 
 Ephemeral values can be used in provider blocks, locals, ephemeral variables and outputs, write-only arguments,
 and other ephemeral resources. They cannot be used in data sources such as `data "curl2"`.
+
+## Managing an API object
+The `curl2` resource sends a request on create, and optional requests on refresh, update and destroy.
+`{id}` in those URIs is replaced with the ID read from the create response at `id_path`.
+
+```terraform
+resource "curl2" "webhook" {
+  auth_type    = "Bearer"
+  bearer_token = var.api_token
+  id_path      = "data.id"
+
+  create  = { uri = "https://api.example.com/hooks", json = jsonencode({ url = "https://example.com/hook" }) }
+  read    = { uri = "https://api.example.com/hooks/{id}" }
+  update  = { uri = "https://api.example.com/hooks/{id}", json = jsonencode({ url = "https://example.com/hook" }) }
+  destroy = { uri = "https://api.example.com/hooks/{id}" }
+}
+```
+
+- Any response outside 200-299 fails the operation.
+- Without `update`, a change to `create` replaces the object.
+- A 404 or 410 on refresh means the object was deleted outside Terraform, so the next apply creates it again.
+- `terraform import` is not supported yet.
+
+## Running the tests
+```sh
+go test ./...                                     # unit tests
+TF_ACC=1 go test ./... -run TestAcc               # acceptance tests; need terraform on PATH
+```
