@@ -211,8 +211,11 @@ func (c *curl2Provider) Configure(ctx context.Context, req provider.ConfigureReq
 	}
 
 	opts := ApiClientOpts{
-		insecure: config.DisableTLS.ValueBool(),
-		timeout:  config.TimeoutMS.ValueInt64(),
+		insecure:   config.DisableTLS.ValueBool(),
+		timeout:    config.TimeoutMS.ValueInt64(),
+		maxRetries: int(retry.RetryAttempts.ValueInt64()),
+		minDelay:   retry.MinDelay,
+		maxDelay:   retry.MaxDelay,
 	}
 	client := NewClient(opts)
 

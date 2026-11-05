@@ -39,12 +39,15 @@ type tokenResponseBody struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
 }
-type auth0TokenDataSource struct{}
+type auth0TokenDataSource struct {
+	client *HttpClient
+}
 
 func (a *auth0TokenDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	if req.ProviderData == nil {
 		return
 	}
+	a.client = req.ProviderData.(*HttpClient)
 }
 
 func (a *auth0TokenDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -145,7 +148,12 @@ func (a *auth0TokenDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	}
 	request.Header.Add("content-type", "application/json")
 
-	res, err := http.DefaultClient.Do(request)
+	// Use the provider's HTTP client so disable_tls and timeout_ms apply here too.
+	httpClient := http.DefaultClient
+	if a.client != nil {
+		httpClient = a.client.httpClient.HTTPClient
+	}
+	res, err := httpClient.Do(request)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error sending HTTP request to get auth0 token",

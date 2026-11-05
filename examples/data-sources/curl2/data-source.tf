@@ -2,7 +2,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.6.1"
+      version = "1.6.3"
     }
   }
 }
@@ -26,6 +26,7 @@ data "curl2" "getPosts" {
   #  headers = {
   #    Accept = "*/*"
   #  }
+  #  ignore_errors = true  # do not fail the plan if the request fails; see error
 }
 
 output "all_posts_response" {
