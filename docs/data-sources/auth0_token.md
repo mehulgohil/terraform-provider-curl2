@@ -17,7 +17,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.6.3"
+      version = "1.7.0"
     }
   }
 }
@@ -56,5 +56,3 @@ output "auth_token" {
 Read-Only:
 
 - `token` (String)
-
-
