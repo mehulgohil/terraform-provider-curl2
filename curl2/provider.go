@@ -2,18 +2,21 @@ package curl2
 
 import (
 	"context"
+	"os"
+
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/ephemeral"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"os"
 )
 
 var (
-	_ provider.Provider = &curl2Provider{}
+	_ provider.Provider                       = &curl2Provider{}
+	_ provider.ProviderWithEphemeralResources = &curl2Provider{}
 )
 
 func NewProvider() provider.Provider {
@@ -221,6 +224,7 @@ func (c *curl2Provider) Configure(ctx context.Context, req provider.ConfigureReq
 
 	resp.DataSourceData = client
 	resp.ResourceData = client
+	resp.EphemeralResourceData = client
 
 	tflog.Info(ctx, "Configured curl2 client", map[string]any{"success": true})
 }
@@ -230,6 +234,14 @@ func (c *curl2Provider) DataSources(ctx context.Context) []func() datasource.Dat
 		NewCurl2DataSource,
 		NewAzureADTokenDataSource,
 		NewAuth0TokenDataSource,
+	}
+}
+
+func (c *curl2Provider) EphemeralResources(ctx context.Context) []func() ephemeral.EphemeralResource {
+	return []func() ephemeral.EphemeralResource{
+		NewCurl2Ephemeral,
+		NewAzureADTokenEphemeral,
+		NewAuth0TokenEphemeral,
 	}
 }
 

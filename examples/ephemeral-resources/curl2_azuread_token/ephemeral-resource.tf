@@ -1,0 +1,28 @@
+# Requires Terraform 1.10 or later. The token is never written to the plan or state.
+terraform {
+  required_providers {
+    curl2 = {
+      source  = "mehulgohil/curl2"
+      version = "1.7.0"
+    }
+  }
+}
+
+provider "curl2" {
+  azure_ad {
+    client_id     = "<AZURE_CLIENT_ID>"     //You can also set ENV AZURE_CLIENT_ID
+    client_secret = "<AZURE_CLIENT_SECRET>" //You can also set ENV AZURE_CLIENT_SECRET
+    tenant_id     = "<AZURE_TENANT_ID>"     //You can also set ENV AZURE_TENANT_ID
+  }
+}
+
+ephemeral "curl2_azuread_token" "graph" {
+  scopes = ["https://graph.microsoft.com/.default"]
+}
+
+ephemeral "curl2" "me" {
+  http_method  = "GET"
+  uri          = "https://graph.microsoft.com/v1.0/me"
+  auth_type    = "Bearer"
+  bearer_token = ephemeral.curl2_azuread_token.graph.token
+}

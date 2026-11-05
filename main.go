@@ -10,7 +10,7 @@ import (
 // Run the docs generation tool, check its repository for more information on how it works and how docs
 // can be customized.
 //
-//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
+//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs@v0.25.0 generate
 
 func main() {
 	err := providerserver.Serve(context.Background(), curl2.NewProvider, providerserver.ServeOpts{

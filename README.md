@@ -17,6 +17,9 @@ You can provide headers like API keys, tokens, or other authentication mechanism
 4. Custom Headers: The custom provider supports the inclusion of custom additional headers in the HTTP requests.
 5. Azure AD Token Data Source: Get token from Azure AD.
 6. Auth0 Token Data Source: Get token from Auth0. 
+7. Ephemeral resources (Terraform 1.10+): `ephemeral "curl2_auth0_token"`, `ephemeral "curl2_azuread_token"` and
+`ephemeral "curl2"` fetch tokens and send requests without writing the token or the response to the plan or state file.
+See [Keeping tokens out of state](#keeping-tokens-out-of-state).
 
 Azure AD Token DataSource:
 This data source helps you to get the token via client credential flow.
@@ -28,7 +31,7 @@ terraform {
   required_providers {
     curl2 = {
       source = "mehulgohil/curl2"
-      version = "1.6.3"
+      version = "1.7.0"
     }
   }
 }
@@ -63,5 +66,22 @@ output "all_posts_status" {
 }
 ```
 
+## Keeping tokens out of state
+The `curl2_auth0_token` and `curl2_azuread_token` data sources store the token in the state file, like every data source.
+On Terraform 1.10 or later, use the ephemeral resources instead: their values are never written to the plan or state.
 
+```terraform
+ephemeral "curl2_auth0_token" "api" {
+  audience = "https://api.example.com"
+}
 
+ephemeral "curl2" "me" {
+  http_method  = "GET"
+  uri          = "https://api.example.com/me"
+  auth_type    = "Bearer"
+  bearer_token = ephemeral.curl2_auth0_token.api.token
+}
+```
+
+Ephemeral values can be used in provider blocks, locals, ephemeral variables and outputs, write-only arguments,
+and other ephemeral resources. They cannot be used in data sources such as `data "curl2"`.
